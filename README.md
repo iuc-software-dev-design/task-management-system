@@ -14,6 +14,10 @@ The Task Management System is designed to help teams efficiently manage their wo
 - **Email Notifications**:
   - Automated email notifications for task assignments and updates.
 
+## 📋 UML diagram
+
+![TMS UML Week2](https://github.com/user-attachments/assets/b34324bb-7b79-46cc-bc6c-3c0eb6bcda3c)
+
 ## 🧑‍💻 Technology Stack
 ### Backend
 - **Framework**: ASP.NET Core & C#
