@@ -1,0 +1,42 @@
+# Build klasörleri
+bin/
+obj/
+
+# User-specific dosyalar
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider ve VSCode ayar dosyaları
+.idea/
+.vscode/
+
+# Visual Studio klasörü
+.vs/
+
+# ASP.NET logları
+*.log
+
+# Paket ve restore cache'leri
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+.nuget/
+packages/
+
+# Temporary dosyalar
+*.tmp
+*.bak
+*.swp
+
+# config dosyaları
+appsettings.*.json
+
+# Mac/Linux sistem dosyaları
+.DS_Store
+
+# Windows Thumbnail cache
+Thumbs.db
