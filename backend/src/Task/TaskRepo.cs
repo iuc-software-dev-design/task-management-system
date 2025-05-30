@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using api.src.User;
 
 namespace api.src.Task
 {
@@ -47,7 +48,7 @@ namespace api.src.Task
             return true;
         }
 
-        public bool Assign(int taskId, List<User> assignees)
+        public bool Assign(int taskId, List<UserEntity> assignees) // DÜZELTİN
         {
             var task = _tasks.FirstOrDefault(t => t.Id == taskId);
             if (task == null) return false;

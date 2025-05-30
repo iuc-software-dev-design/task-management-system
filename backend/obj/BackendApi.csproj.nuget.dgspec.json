@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/ali/Desktop/task-management-system/backend/BackendApi.csproj": {}
+    "C:\\Users\\user\\Desktop\\task-management-system\\backend\\BackendApi.csproj": {}
   },
   "projects": {
-    "/Users/ali/Desktop/task-management-system/backend/BackendApi.csproj": {
+    "C:\\Users\\user\\Desktop\\task-management-system\\backend\\BackendApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/ali/Desktop/task-management-system/backend/BackendApi.csproj",
+        "projectUniqueName": "C:\\Users\\user\\Desktop\\task-management-system\\backend\\BackendApi.csproj",
         "projectName": "BackendApi",
-        "projectPath": "/Users/ali/Desktop/task-management-system/backend/BackendApi.csproj",
-        "packagesPath": "/Users/ali/.nuget/packages/",
-        "outputPath": "/Users/ali/Desktop/task-management-system/backend/obj/",
+        "projectPath": "C:\\Users\\user\\Desktop\\task-management-system\\backend\\BackendApi.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\user\\Desktop\\task-management-system\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/ali/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -47,6 +47,14 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -71,7 +79,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
