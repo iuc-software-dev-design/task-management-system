@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using api.src.User;
 
 namespace api.src.Task
 {
@@ -47,7 +48,7 @@ namespace api.src.Task
         }
 
         [HttpPost("{id}/assign")]
-        public IActionResult AssignTask(int id, [FromBody] List<User> assignees)
+        public IActionResult AssignTask(int id, [FromBody] List<UserEntity> assignees) // DÜZELTİN
         {
             var result = _service.AssignTask(id, assignees);
             if (!result) return NotFound();
