@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace api.src.Notification
+namespace backend.src.Notification
 {
     public class NotificationRepo
     {
@@ -15,9 +15,10 @@ namespace api.src.Notification
             return notification;
         }
 
-        public List<NotificationEntity> GetByRecipientId(int recipientId)
+        // RecipientId string olarak değiştir
+        public List<NotificationEntity> GetByRecipientId(string recipientId)
         {
-            return _notifications.Where(n => n.Recipient.Id == recipientId).ToList();
+            return _notifications.Where(n => n.RecipientId == recipientId).ToList();
         }
 
         public NotificationEntity GetById(int id)

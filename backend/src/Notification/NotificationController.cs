@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using api.src.User;
-using api.src.Task;
 using System.Collections.Generic;
 
-namespace api.src.Notification
+namespace backend.src.Notification
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -14,15 +12,12 @@ namespace api.src.Notification
         [HttpPost("send")]
         public IActionResult SendEmailNotification([FromBody] SendNotificationRequest req)
         {
-            // Normalde burada User ve Task servislerinden ilgili entity'ler çekilmeli
-            var recipient = new UserEntity { Id = req.RecipientId, Name = req.RecipientName, Email = req.RecipientEmail };
-            var relatedTask = new TaskEntity { Id = req.TaskId, Title = req.TaskTitle };
-            var notification = _service.SendEmailNotification(req.Message, recipient, relatedTask);
+            var notification = _service.SendEmailNotification(req.Message, req.RecipientId, req.TaskId);
             return Ok(notification);
         }
 
         [HttpGet("user/{userId}")]
-        public ActionResult<List<NotificationEntity>> GetNotificationsForUser(int userId)
+        public ActionResult<List<NotificationEntity>> GetNotificationsForUser(string userId)
         {
             var notifications = _service.GetNotificationsForUser(userId);
             return Ok(notifications);
@@ -40,10 +35,7 @@ namespace api.src.Notification
     public class SendNotificationRequest
     {
         public string Message { get; set; }
-        public int RecipientId { get; set; }
-        public string RecipientName { get; set; }
-        public string RecipientEmail { get; set; }
-        public int TaskId { get; set; }
-        public string TaskTitle { get; set; }
+        public string RecipientId { get; set; } // string olarak değiştir
+        public int? TaskId { get; set; } // nullable yap
     }
 }
