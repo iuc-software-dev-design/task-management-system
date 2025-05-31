@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using api.src.User;
+using backend.src.ApplicationUser;
 
-namespace api.src.Task
+namespace backend.src.Task
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -48,7 +48,7 @@ namespace api.src.Task
         }
 
         [HttpPost("{id}/assign")]
-        public IActionResult AssignTask(int id, [FromBody] List<UserEntity> assignees) // DÜZELTİN
+        public IActionResult AssignTask(int id, [FromBody] List<AppUser> assignees) // DÜZELTİN
         {
             var result = _service.AssignTask(id, assignees);
             if (!result) return NotFound();

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using api.src.User;
+using backend.src.ApplicationUser;
 
-namespace api.src.Task
+namespace backend.src.Task
 {
     public class TaskService
     {
@@ -32,7 +32,7 @@ namespace api.src.Task
             return _repo.Delete(id);
         }
 
-        public bool AssignTask(int taskId, List<UserEntity> assignees) // DÜZELTİN
+        public bool AssignTask(int taskId, List<AppUser> assignees) // DÜZELTİN
         {
             return _repo.Assign(taskId, assignees);
         }

@@ -2,20 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using api.Interfaces;
-using api.src.User;
+using backend.Interfaces;
+using backend.src.ApplicationUser;
 
-namespace api.src.Task
+namespace backend.src.Task
 {
     public class TaskEntity : IEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public List<UserEntity> Assignees { get; set; } // <-- Burayı düzeltin
+        public List<AppUser> Assignees { get; set; } = new List<AppUser>();
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public UserEntity CreatedBy { get; set; }
+        public AppUser CreatedBy { get; set; }
+        public Status TaskStatus { get; set; } = Status.NotStarted;
         public enum Status
         {
             NotStarted,

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using api.src.User;
+using backend.src.ApplicationUser;
 
-namespace api.src.Task
+namespace backend.src.Task
 {
     public class TaskRepo
     {
@@ -48,7 +48,7 @@ namespace api.src.Task
             return true;
         }
 
-        public bool Assign(int taskId, List<UserEntity> assignees) // DÜZELTİN
+        public bool Assign(int taskId, List<AppUser> assignees) // DÜZELTİN
         {
             var task = _tasks.FirstOrDefault(t => t.Id == taskId);
             if (task == null) return false;

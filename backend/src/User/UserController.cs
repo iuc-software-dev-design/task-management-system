@@ -1,54 +1,78 @@
+using backend.src.ApplicationUser;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace api.src.User
+namespace backend.src.User
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Authentication gerekli
     public class UserController : ControllerBase
     {
-        private readonly UserService _service = new UserService();
+        private readonly UserService _service;
 
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterRequest user)
+        public UserController(UserService service)
         {
-            var entity = new UserEntity
-            {
-                Name = user.Name,
-                Email = user.Email,
-                PasswordHash = user.Password,
-                UserRole = UserEntity.Role.USER
-            };
-            var created = _service.Register(entity);
-            return Ok(created);
+            _service = service;
         }
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest req)
+        [HttpGet]
+        public ActionResult<List<UserDto>> GetAllUsers()
         {
-            var user = _service.Login(req.Email, req.Password);
-            if (user == null) return Unauthorized();
+            var users = _service.GetAllUsers();
+            return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<UserDto> GetUser(int id)
+        {
+            var user = _service.GetUserById(id);
+            if (user == null) return NotFound();
             return Ok(user);
         }
 
-        [HttpPost("{id}/verify")]
-        public IActionResult VerifyEmail(int id)
+        [HttpPut("{id}")]
+        public IActionResult UpdateProfile(int id, [FromBody] UpdateUserDto updateDto)
         {
-            var result = _service.VerifyEmail(id);
+            var user = _service.UpdateProfile(id, updateDto);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler silebilir
+        public IActionResult DeleteUser(int id)
+        {
+            var result = _service.DeleteUser(id);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPut("{id}/role")]
+        [Authorize(Roles = "MANAGER")] // Sadece manager role değiştirebilir
+        public IActionResult ChangeUserRole(int id, [FromBody] ChangeRoleDto roleDto)
+        {
+            var result = _service.ChangeUserRole(id, roleDto.Role);
             if (!result) return NotFound();
             return Ok();
         }
+
+        [HttpGet("role/{role}")]
+        public ActionResult<List<UserDto>> GetUsersByRole(AppUser.Role role)
+        {
+            var users = _service.GetUsersByRole(role);
+            return Ok(users);
+        }
     }
 
-    public class RegisterRequest
+    public class UpdateUserDto
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
     }
 
-    public class LoginRequest
+    public class ChangeRoleDto
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public AppUser.Role Role { get; set; }
     }
 }
