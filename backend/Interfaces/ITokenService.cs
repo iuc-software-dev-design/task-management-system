@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using api.src.User; // EKLEYİN
+using backend.src.ApplicationUser; // EKLEYİN
 
 
-namespace api.Interfaces
+namespace backend.Interfaces
 {
     public interface ITokenService
     {
-        string CreateToken(UserEntity user);
+        string CreateToken(AppUser user);
     }
 }
