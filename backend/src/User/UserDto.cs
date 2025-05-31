@@ -1,6 +1,6 @@
-using api.Interfaces;
+using backend.Interfaces;
 
-namespace api.src.User
+namespace backend.src.User
 {
     public class UserDto : IDto
     {

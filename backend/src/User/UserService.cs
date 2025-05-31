@@ -1,50 +1,60 @@
-using System;
-using System.Security.Cryptography;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using backend.src.ApplicationUser;
 
-namespace api.src.User
+namespace backend.src.User
 {
     public class UserService
     {
-        private readonly UserRepo _repo = new UserRepo();
+        private readonly UserRepo _repo;
 
-        public UserDto Register(UserEntity user)
+        public UserService(UserRepo repo)
         {
-            user.PasswordHash = HashPassword(user.PasswordHash);
-            user.EmailVerified = false;
-            var created = _repo.Add(user);
-            return ToDto(created);
+            _repo = repo;
+        }
+        // User Management Operations
+        public List<UserDto> GetAllUsers()
+        {
+            return _repo.GetAll().Select(u => ToDto(u)).ToList();
         }
 
-        public UserDto Login(string email, string password)
+        public UserDto GetUserById(int id)
         {
-            var user = _repo.GetByEmail(email);
+            var user = _repo.GetById(id);
+            return user == null ? null : ToDto(user);
+        }
+
+        public UserDto UpdateProfile(int id, UpdateUserDto updateDto)
+        {
+            var user = _repo.GetById(id);
             if (user == null) return null;
-            if (!VerifyPassword(password, user.PasswordHash)) return null;
+
+            user.Name = updateDto.Name ?? user.Name;
+            user.Email = updateDto.Email ?? user.Email;
+
             return ToDto(user);
         }
 
-        public bool VerifyEmail(int id)
+        public bool DeleteUser(int id)
         {
-            return _repo.VerifyEmail(id);
+            return _repo.Delete(id);
         }
 
-        private string HashPassword(string password)
+        public bool ChangeUserRole(int id, AppUser.Role newRole)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = Encoding.UTF8.GetBytes(password);
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
+            var user = _repo.GetById(id);
+            if (user == null) return false;
+
+            user.UserRole = newRole;
+            return true;
         }
 
-        private bool VerifyPassword(string password, string hash)
+        public List<UserDto> GetUsersByRole(AppUser.Role role)
         {
-            return HashPassword(password) == hash;
+            return _repo.GetByRole(role).Select(u => ToDto(u)).ToList();
         }
 
-        private UserDto ToDto(UserEntity user)
+        private UserDto ToDto(AppUser user)
         {
             return new UserDto
             {

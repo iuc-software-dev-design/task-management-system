@@ -1,7 +1,9 @@
 using System;
-using api.Interfaces;
+using System.Collections.Generic;
+using backend.Interfaces;
+using backend.src.Task;
 
-namespace api.src.User
+namespace backend.src.User
 {
     public class UserEntity : IEntity
     {
@@ -10,6 +12,7 @@ namespace api.src.User
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public bool EmailVerified { get; set; } = false;
+        public List<TaskEntity> Tasks { get; set; } = new List<TaskEntity>();
         public enum Role
         {
             USER,
@@ -17,5 +20,6 @@ namespace api.src.User
             TEAM_LEAD,
         }
         public Role UserRole { get; set; } = Role.USER;
+
     }
 }
