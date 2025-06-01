@@ -1,6 +1,7 @@
 using backend.src.ApplicationUser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace backend.src.User
 {
@@ -17,32 +18,89 @@ namespace backend.src.User
         }
 
         [HttpGet]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler tüm kullanıcıları görebilir
         public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
             var users = await _service.GetAllUsers();
             return Ok(users);
         }
 
+        [HttpGet("me")] // Kendi profilini görme
+        public async Task<ActionResult<UserDto>> GetMyProfile()
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var user = await _service.GetUserById(currentUserId);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUser(string id) // int'den string'e değişti
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler başka kullanıcıları görebilir
+        public async Task<ActionResult<UserDto>> GetUser(string id)
         {
             var user = await _service.GetUserById(id);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProfile(string id, [FromBody] UpdateUserDto updateDto) // int'den string'e değişti
+        [HttpPut("me")] // Kendi profilini güncelleme
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateUserDto updateDto)
         {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var user = await _service.UpdateProfile(currentUserId, updateDto);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler başka kullanıcıları güncelleyebilir
+        public async Task<IActionResult> UpdateProfile(string id, [FromBody] UpdateUserDto updateDto)
+        {
+            // Güvenlik kontrolü: Normal user başkasının profilini güncelleyemez
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (currentUserId != id && !IsManagerOrTeamLead(userRole))
+            {
+                return Forbid("You can only update your own profile");
+            }
+
             var user = await _service.UpdateProfile(id, updateDto);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler silebilir
-        public async Task<IActionResult> DeleteUser(string id) // int'den string'e değişti
+        [HttpDelete("me")] // Kendi hesabını silme
+        public async Task<IActionResult> DeleteMyAccount()
         {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+                return Unauthorized();
+
+            var result = await _service.DeleteUser(currentUserId);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler başka kullanıcıları silebilir
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            // Güvenlik kontrolü: Normal user başkasını silemez
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (currentUserId != id && !IsManagerOrTeamLead(userRole))
+            {
+                return Forbid("You can only delete your own account");
+            }
+
             var result = await _service.DeleteUser(id);
             if (!result) return NotFound();
             return NoContent();
@@ -50,7 +108,7 @@ namespace backend.src.User
 
         [HttpPut("{id}/role")]
         [Authorize(Roles = "MANAGER")] // Sadece manager role değiştirebilir
-        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] ChangeRoleDto roleDto) // int'den string'e değişti
+        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] ChangeRoleDto roleDto)
         {
             var result = await _service.ChangeUserRole(id, roleDto.Role);
             if (!result) return NotFound();
@@ -58,10 +116,17 @@ namespace backend.src.User
         }
 
         [HttpGet("role/{role}")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler role'e göre listeleyebilir
         public async Task<ActionResult<List<UserDto>>> GetUsersByRole(AppUser.Role role)
         {
             var users = await _service.GetUsersByRole(role);
             return Ok(users);
+        }
+
+        // Helper method
+        private bool IsManagerOrTeamLead(string role)
+        {
+            return role == "MANAGER" || role == "TEAM_LEAD";
         }
     }
 
