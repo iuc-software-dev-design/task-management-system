@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using backend.Interfaces;
 using backend.src.ApplicationUser;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace backend.src.Authentication
@@ -26,7 +27,9 @@ namespace backend.src.Authentication
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.Name),
-                new Claim(ClaimTypes.Role, user.UserRole.ToString())
+                new Claim(ClaimTypes.Role, user.UserRole.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id)
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
