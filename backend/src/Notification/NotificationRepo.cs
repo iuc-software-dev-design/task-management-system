@@ -1,36 +1,48 @@
-using System.Collections.Generic;
-using System.Linq;
+using backend.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.src.Notification
 {
     public class NotificationRepo
     {
-        private static List<NotificationEntity> _notifications = new List<NotificationEntity>();
-        private static int _nextId = 1;
+        private readonly AppDbContext _context;
 
-        public NotificationEntity Add(NotificationEntity notification)
+        public NotificationRepo(AppDbContext context)
         {
-            notification.Id = _nextId++;
-            _notifications.Add(notification);
+            _context = context;
+        }
+
+        public async Task<NotificationEntity> Add(NotificationEntity notification)
+        {
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
             return notification;
         }
 
-        // RecipientId string olarak değiştir
-        public List<NotificationEntity> GetByRecipientId(string recipientId)
+        public async Task<List<NotificationEntity>> GetByRecipientId(string recipientId)
         {
-            return _notifications.Where(n => n.RecipientId == recipientId).ToList();
+            return await _context.Notifications
+                .Include(n => n.Recipient)
+                .Include(n => n.RelatedTask)
+                .Where(n => n.RecipientId == recipientId)
+                .ToListAsync();
         }
 
-        public NotificationEntity GetById(int id)
+        public async Task<NotificationEntity> GetById(int id)
         {
-            return _notifications.FirstOrDefault(n => n.Id == id);
+            return await _context.Notifications
+                .Include(n => n.Recipient)
+                .Include(n => n.RelatedTask)
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public bool MarkAsRead(int id)
+        public async Task<bool> MarkAsRead(int id)
         {
-            var notification = GetById(id);
+            var notification = await GetById(id);
             if (notification == null) return false;
+
             notification.IsRead = true;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

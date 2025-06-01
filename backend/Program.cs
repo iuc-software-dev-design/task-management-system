@@ -44,10 +44,10 @@ builder.Services.AddScoped<TaskRepo>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<AccountService>();
 
-// User Management Services
+// App Services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<NotificationService>();
-
 
 var app = builder.Build();
 
@@ -59,6 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

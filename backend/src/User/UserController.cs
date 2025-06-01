@@ -17,50 +17,50 @@ namespace backend.src.User
         }
 
         [HttpGet]
-        public ActionResult<List<UserDto>> GetAllUsers()
+        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
-            var users = _service.GetAllUsers();
+            var users = await _service.GetAllUsers();
             return Ok(users);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<UserDto> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(string id) // int'den string'e değişti
         {
-            var user = _service.GetUserById(id);
+            var user = await _service.GetUserById(id);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateProfile(int id, [FromBody] UpdateUserDto updateDto)
+        public async Task<IActionResult> UpdateProfile(string id, [FromBody] UpdateUserDto updateDto) // int'den string'e değişti
         {
-            var user = _service.UpdateProfile(id, updateDto);
+            var user = await _service.UpdateProfile(id, updateDto);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "MANAGER,TEAM_LEAD")] // Sadece yöneticiler silebilir
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id) // int'den string'e değişti
         {
-            var result = _service.DeleteUser(id);
+            var result = await _service.DeleteUser(id);
             if (!result) return NotFound();
             return NoContent();
         }
 
         [HttpPut("{id}/role")]
         [Authorize(Roles = "MANAGER")] // Sadece manager role değiştirebilir
-        public IActionResult ChangeUserRole(int id, [FromBody] ChangeRoleDto roleDto)
+        public async Task<IActionResult> ChangeUserRole(string id, [FromBody] ChangeRoleDto roleDto) // int'den string'e değişti
         {
-            var result = _service.ChangeUserRole(id, roleDto.Role);
+            var result = await _service.ChangeUserRole(id, roleDto.Role);
             if (!result) return NotFound();
             return Ok();
         }
 
         [HttpGet("role/{role}")]
-        public ActionResult<List<UserDto>> GetUsersByRole(AppUser.Role role)
+        public async Task<ActionResult<List<UserDto>>> GetUsersByRole(AppUser.Role role)
         {
-            var users = _service.GetUsersByRole(role);
+            var users = await _service.GetUsersByRole(role);
             return Ok(users);
         }
     }

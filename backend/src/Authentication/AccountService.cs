@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using backend.src.ApplicationUser;
 using backend.Interfaces;
 using backend.src.User;
@@ -12,27 +13,26 @@ namespace backend.src.Authentication
         private readonly UserRepo _userRepo;
         private readonly ITokenService _tokenService;
 
-        // ✅ Constructor injection
         public AccountService(UserRepo userRepo, ITokenService tokenService)
         {
             _userRepo = userRepo;
             _tokenService = tokenService;
         }
 
-        public NewUserDto Register(AppUser user)
+        public async Task<NewUserDto> Register(AppUser user, string password)
         {
             try
             {
                 // Email zaten kayıtlı mı kontrol et
-                var existingUser = _userRepo.GetByEmail(user.Email);
+                var existingUser = await _userRepo.GetByEmail(user.Email);
                 if (existingUser != null) return null;
 
                 // Password hash
-                user.PasswordHash = HashPassword(user.PasswordHash);
+                user.PasswordHash = HashPassword(password);
                 user.EmailVerified = false;
 
                 // User'ı kaydet
-                var created = _userRepo.Add(user);
+                var created = await _userRepo.Add(user);
 
                 // DTO'ya çevir
                 var dto = ToDto(created);
@@ -42,17 +42,16 @@ namespace backend.src.Authentication
             }
             catch (Exception ex)
             {
-                // Log the exception
                 Console.WriteLine($"Register error: {ex.Message}");
                 return null;
             }
         }
 
-        public NewUserDto Login(string email, string password)
+        public async Task<NewUserDto> Login(string email, string password)
         {
             try
             {
-                var user = _userRepo.GetByEmail(email);
+                var user = await _userRepo.GetByEmail(email);
                 if (user == null) return null;
 
                 if (!VerifyPassword(password, user.PasswordHash)) return null;
@@ -68,9 +67,9 @@ namespace backend.src.Authentication
             }
         }
 
-        public bool VerifyEmail(int id)
+        public async Task<bool> VerifyEmail(string userId) // int'den string'e değişti
         {
-            return _userRepo.VerifyEmail(id);
+            return await _userRepo.VerifyEmail(userId);
         }
 
         private string HashPassword(string password)
@@ -96,7 +95,8 @@ namespace backend.src.Authentication
                 Name = user.Name,
                 Email = user.Email,
                 EmailVerified = user.EmailVerified,
-                UserRole = user.UserRole.ToString()
+                UserRole = user.UserRole.ToString(),
+                Token = "" // Controller'da set edilecek
             };
         }
     }

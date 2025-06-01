@@ -6,7 +6,6 @@ namespace backend.src.ApplicationUser
 {
     public class AppUser : IdentityUser
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool EmailVerified { get; set; } = false;
         public Role UserRole { get; set; } = Role.USER;

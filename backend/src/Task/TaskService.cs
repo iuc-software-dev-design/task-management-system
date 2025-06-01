@@ -1,40 +1,46 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using backend.src.ApplicationUser;
 
 namespace backend.src.Task
 {
     public class TaskService
     {
-        private readonly TaskRepo _repo = new TaskRepo();
+        private readonly TaskRepo _repo;
 
-        public List<TaskEntity> ListTasks()
+        public TaskService(TaskRepo repo)
         {
-            return _repo.GetAll();
+            _repo = repo;
         }
 
-        public TaskEntity GetTask(int id)
+        public async Task<List<TaskEntity>> ListTasks()
         {
-            return _repo.GetById(id);
+            return await _repo.GetAll();
         }
 
-        public TaskEntity CreateTask(TaskEntity task)
+        public async Task<TaskEntity> GetTask(int id)
         {
-            return _repo.Add(task);
+            return await _repo.GetById(id);
         }
 
-        public bool UpdateTask(int id, TaskEntity updatedTask)
+        public async Task<TaskEntity> CreateTask(TaskEntity task)
         {
-            return _repo.Update(id, updatedTask);
+            return await _repo.Add(task);
         }
 
-        public bool DeleteTask(int id)
+        public async Task<bool> UpdateTask(int id, TaskEntity updatedTask)
         {
-            return _repo.Delete(id);
+            return await _repo.Update(id, updatedTask);
         }
 
-        public bool AssignTask(int taskId, List<AppUser> assignees) // DÜZELTİN
+        public async Task<bool> DeleteTask(int id)
         {
-            return _repo.Assign(taskId, assignees);
+            return await _repo.Delete(id);
+        }
+
+        public async Task<bool> AssignTask(int taskId, List<AppUser> assignees)
+        {
+            return await _repo.Assign(taskId, assignees);
         }
     }
 }
