@@ -4,7 +4,7 @@ namespace backend.src.Authentication
 {
     public class NewUserDto : IDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public bool EmailVerified { get; set; }

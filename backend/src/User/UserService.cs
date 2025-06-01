@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using backend.src.ApplicationUser;
 
 namespace backend.src.User
@@ -12,46 +13,51 @@ namespace backend.src.User
         {
             _repo = repo;
         }
+
         // User Management Operations
-        public List<UserDto> GetAllUsers()
+        public async Task<List<UserDto>> GetAllUsers()
         {
-            return _repo.GetAll().Select(u => ToDto(u)).ToList();
+            var users = await _repo.GetAll();
+            return users.Select(ToDto).ToList();
         }
 
-        public UserDto GetUserById(int id)
+        public async Task<UserDto> GetUserById(string id)
         {
-            var user = _repo.GetById(id);
+            var user = await _repo.GetById(id);
             return user == null ? null : ToDto(user);
         }
 
-        public UserDto UpdateProfile(int id, UpdateUserDto updateDto)
+        public async Task<UserDto> UpdateProfile(string id, UpdateUserDto updateDto)
         {
-            var user = _repo.GetById(id);
+            var user = await _repo.GetById(id);
             if (user == null) return null;
 
             user.Name = updateDto.Name ?? user.Name;
             user.Email = updateDto.Email ?? user.Email;
 
+            await _repo.UpdateAsync(user);
             return ToDto(user);
         }
 
-        public bool DeleteUser(int id)
+        public async Task<bool> DeleteUser(string id)
         {
-            return _repo.Delete(id);
+            return await _repo.Delete(id);
         }
 
-        public bool ChangeUserRole(int id, AppUser.Role newRole)
+        public async Task<bool> ChangeUserRole(string id, AppUser.Role newRole)
         {
-            var user = _repo.GetById(id);
+            var user = await _repo.GetById(id);
             if (user == null) return false;
 
             user.UserRole = newRole;
+            await _repo.UpdateAsync(user);
             return true;
         }
 
-        public List<UserDto> GetUsersByRole(AppUser.Role role)
+        public async Task<List<UserDto>> GetUsersByRole(AppUser.Role role)
         {
-            return _repo.GetByRole(role).Select(u => ToDto(u)).ToList();
+            var users = await _repo.GetByRole(role);
+            return users.Select(ToDto).ToList();
         }
 
         private UserDto ToDto(AppUser user)

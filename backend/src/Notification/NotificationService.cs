@@ -1,32 +1,38 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace backend.src.Notification
 {
     public class NotificationService
     {
-        private readonly NotificationRepo _repo = new NotificationRepo();
+        private readonly NotificationRepo _repo;
 
-        // Method signature'ı basit parametrelerle değiştirelim
-        public NotificationEntity SendEmailNotification(string message, string recipientId, int? relatedTaskId = null)
+        public NotificationService(NotificationRepo repo)
+        {
+            _repo = repo;
+        }
+
+        public async Task<NotificationEntity> SendEmailNotification(string message, string recipientId, int? relatedTaskId = null)
         {
             var notification = new NotificationEntity
             {
                 Message = message,
                 RecipientId = recipientId,
                 RelatedTaskId = relatedTaskId,
-                IsRead = false
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
             };
-            return _repo.Add(notification);
+            return await _repo.Add(notification);
         }
 
-        public List<NotificationEntity> GetNotificationsForUser(string userId)
+        public async Task<List<NotificationEntity>> GetNotificationsForUser(string userId)
         {
-            return _repo.GetByRecipientId(userId);
+            return await _repo.GetByRecipientId(userId);
         }
 
-        public bool MarkAsRead(int notificationId)
+        public async Task<bool> MarkAsRead(int notificationId)
         {
-            return _repo.MarkAsRead(notificationId);
+            return await _repo.MarkAsRead(notificationId);
         }
     }
 }

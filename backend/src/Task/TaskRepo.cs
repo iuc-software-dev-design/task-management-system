@@ -1,58 +1,73 @@
-using System.Collections.Generic;
-using System.Linq;
+using backend.Data;
 using backend.src.ApplicationUser;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.src.Task
 {
     public class TaskRepo
     {
-        private static List<TaskEntity> _tasks = new List<TaskEntity>();
-        private static int _nextId = 1;
+        private readonly AppDbContext _context;
 
-        public List<TaskEntity> GetAll()
+        public TaskRepo(AppDbContext context)
         {
-            return _tasks;
+            _context = context;
         }
 
-        public TaskEntity GetById(int id)
+        public async Task<List<TaskEntity>> GetAll()
         {
-            return _tasks.FirstOrDefault(t => t.Id == id);
+            return await _context.Tasks
+                .Include(t => t.CreatedBy)
+                .Include(t => t.Assignees)
+                .ToListAsync();
         }
 
-        public TaskEntity Add(TaskEntity task)
+        public async Task<TaskEntity> GetById(int id)
         {
-            task.Id = _nextId++;
-            _tasks.Add(task);
+            return await _context.Tasks
+                .Include(t => t.CreatedBy)
+                .Include(t => t.Assignees)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<TaskEntity> Add(TaskEntity task)
+        {
+            _context.Tasks.Add(task);
+            await _context.SaveChangesAsync();
             return task;
         }
 
-        public bool Update(int id, TaskEntity updatedTask)
+        public async Task<bool> Update(int id, TaskEntity updatedTask)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == id);
+            var task = await GetById(id);
             if (task == null) return false;
 
             task.Title = updatedTask.Title;
             task.Description = updatedTask.Description;
-            task.Assignees = updatedTask.Assignees;
             task.StartDate = updatedTask.StartDate;
             task.EndDate = updatedTask.EndDate;
-            task.CreatedBy = updatedTask.CreatedBy;
+            task.TaskStatus = updatedTask.TaskStatus;
+
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == id);
+            var task = await GetById(id);
             if (task == null) return false;
-            _tasks.Remove(task);
+
+            _context.Tasks.Remove(task);
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public bool Assign(int taskId, List<AppUser> assignees) // DÜZELTİN
+        public async Task<bool> Assign(int taskId, List<AppUser> assignees)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+            var task = await GetById(taskId);
             if (task == null) return false;
+
             task.Assignees = assignees;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

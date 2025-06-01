@@ -1,54 +1,74 @@
-using System.Collections.Generic;
-using System.Linq;
+using backend.Data;
 using backend.src.ApplicationUser;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.src.User
 {
     public class UserRepo
     {
-        private static List<AppUser> _users = new List<AppUser>();
-        private static int _nextId = 1;
+        private readonly AppDbContext _context;
 
-        public AppUser Add(AppUser user)
+        public UserRepo(AppDbContext context)
         {
-            user.Id = _nextId++;
-            _users.Add(user);
+            _context = context;
+        }
+
+        public async Task<AppUser> Add(AppUser user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
             return user;
         }
 
-        public AppUser GetByEmail(string email)
+        public async Task<AppUser> GetByEmail(string email)
         {
-            return _users.FirstOrDefault(u => u.Email == email);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public AppUser GetById(int id)
+        public async Task<AppUser> GetById(string id)
         {
-            return _users.FirstOrDefault(u => u.Id == id);
+            return await _context.Users.FindAsync(id);
         }
 
-        public List<AppUser> GetAll()
+        public async Task<List<AppUser>> GetAll()
         {
-            return _users.ToList();
+            return await _context.Users.ToListAsync();
         }
 
-        public List<AppUser> GetByRole(AppUser.Role role)
+        public async Task<List<AppUser>> GetByRole(AppUser.Role role)
         {
-            return _users.Where(u => u.UserRole == role).ToList();
+            return await _context.Users.Where(u => u.UserRole == role).ToListAsync();
         }
-
-        public bool Delete(int id)
+        public async Task<bool> UpdateAsync(AppUser user)
         {
-            var user = GetById(id);
+            try
+            {
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> Delete(string id)
+        {
+            var user = await GetById(id);
             if (user == null) return false;
-            _users.Remove(user);
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public bool VerifyEmail(int id)
+        public async Task<bool> VerifyEmail(string id)
         {
-            var user = GetById(id);
+            var user = await GetById(id);
             if (user == null) return false;
+
             user.EmailVerified = true;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

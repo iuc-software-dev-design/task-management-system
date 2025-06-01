@@ -1,5 +1,6 @@
 using backend.src.ApplicationUser;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace backend.src.Authentication
 {
@@ -15,12 +16,12 @@ namespace backend.src.Authentication
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] AuthLoginDto authLoginDto)
+        public async Task<IActionResult> Login([FromBody] AuthLoginDto authLoginDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = _accountService.Login(authLoginDto.Email, authLoginDto.Password);
+            var user = await _accountService.Login(authLoginDto.Email, authLoginDto.Password);
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
@@ -28,32 +29,39 @@ namespace backend.src.Authentication
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] AuthRegisterDto authRegisterDto)
+        public async Task<IActionResult> Register([FromBody] AuthRegisterDto authRegisterDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var user = new AppUser
             {
-                Name = authRegisterDto.Name,
+                UserName = authRegisterDto.Email,
                 Email = authRegisterDto.Email,
-                PasswordHash = authRegisterDto.Password,
-                UserRole = AppUser.Role.USER
+                Name = authRegisterDto.Name,
+                UserRole = AppUser.Role.USER,
+                EmailVerified = false
             };
 
-            var created = _accountService.Register(user);
+            var created = await _accountService.Register(user, authRegisterDto.Password);
             if (created == null)
-                return BadRequest("Email already exists");
+                return BadRequest("Email already exists or registration failed");
 
             return Ok(created);
         }
 
-        [HttpPost("{id}/verify")]
-        public IActionResult VerifyEmail(int id)
+        [HttpPost("verify-email/{userId}")]
+        public async Task<IActionResult> VerifyEmail(string userId)
         {
-            var result = _accountService.VerifyEmail(id);
-            if (!result) return NotFound();
-            return Ok();
+            var result = await _accountService.VerifyEmail(userId);
+            if (!result)
+                return NotFound("User not found");
+
+            return Ok("Email verified successfully");
         }
     }
+
+
+
+
 }

@@ -8,49 +8,55 @@ namespace backend.src.Task
     [Route("api/[controller]")]
     public class TaskController : ControllerBase
     {
-        private readonly TaskService _service = new TaskService();
+        private readonly TaskService _service;
+
+        public TaskController(TaskService service) // Constructor injection
+        {
+            _service = service;
+        }
 
         [HttpGet]
-        public ActionResult<List<TaskEntity>> ListTasks()
+        public async Task<ActionResult<List<TaskEntity>>> ListTasks()
         {
-            return Ok(_service.ListTasks());
+            var tasks = await _service.ListTasks();
+            return Ok(tasks);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<TaskEntity> GetTask(int id)
+        public async Task<ActionResult<TaskEntity>> GetTask(int id)
         {
-            var task = _service.GetTask(id);
+            var task = await _service.GetTask(id);
             if (task == null) return NotFound();
             return Ok(task);
         }
 
         [HttpPost]
-        public ActionResult<TaskEntity> CreateTask([FromBody] TaskEntity task)
+        public async Task<ActionResult<TaskEntity>> CreateTask([FromBody] TaskEntity task)
         {
-            var created = _service.CreateTask(task);
+            var created = await _service.CreateTask(task);
             return CreatedAtAction(nameof(GetTask), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateTask(int id, [FromBody] TaskEntity task)
+        public async Task<IActionResult> UpdateTask(int id, [FromBody] TaskEntity task)
         {
-            var result = _service.UpdateTask(id, task);
+            var result = await _service.UpdateTask(id, task);
             if (!result) return NotFound();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteTask(int id)
+        public async Task<IActionResult> DeleteTask(int id)
         {
-            var result = _service.DeleteTask(id);
+            var result = await _service.DeleteTask(id);
             if (!result) return NotFound();
             return NoContent();
         }
 
         [HttpPost("{id}/assign")]
-        public IActionResult AssignTask(int id, [FromBody] List<AppUser> assignees) // DÜZELTİN
+        public async Task<IActionResult> AssignTask(int id, [FromBody] List<AppUser> assignees)
         {
-            var result = _service.AssignTask(id, assignees);
+            var result = await _service.AssignTask(id, assignees);
             if (!result) return NotFound();
             return NoContent();
         }
