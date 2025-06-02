@@ -54,5 +54,45 @@ namespace api.src.Task
             if (!result) return NotFound();
             return NoContent();
         }
+
+        [HttpPatch("{id}/title")]
+        public IActionResult UpdateTitle(int id, [FromBody] string title)
+        {
+            var result = _service.UpdateTitle(id, title);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/description")]
+        public IActionResult UpdateDescription(int id, [FromBody] string description)
+        {
+            var result = _service.UpdateDescription(id, description);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/start-date")]
+        public IActionResult UpdateStartDate(int id, [FromBody] DateTime startDate)
+        {
+            var result = _service.UpdateStartDate(id, startDate);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/end-date")]
+        public IActionResult UpdateEndDate(int id, [FromBody] DateTime endDate)
+        {
+            var result = _service.UpdateEndDate(id, endDate);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPatch("{id}/status")]
+        public IActionResult UpdateStatus(int id, [FromBody] TaskEntity.Status status)
+        {
+            var result = _service.UpdateStatus(id, status);
+            if (!result) return NotFound();
+            return NoContent();
+        }
     }
 }

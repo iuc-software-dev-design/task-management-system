@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using api.src.User;
+using System;
 
 namespace api.src.Task
 {
@@ -35,6 +36,46 @@ namespace api.src.Task
         public bool AssignTask(int taskId, List<UserEntity> assignees) // DÜZELTİN
         {
             return _repo.Assign(taskId, assignees);
+        }
+
+        public bool UpdateTitle(int id, string title)
+        {
+            var task = _repo.GetById(id);
+            if (task == null) return false;
+            task.Title = title;
+            return _repo.Update(id, task);
+        }
+
+        public bool UpdateDescription(int id, string description)
+        {
+            var task = _repo.GetById(id);
+            if (task == null) return false;
+            task.Description = description;
+            return _repo.Update(id, task);
+        }
+
+        public bool UpdateStartDate(int id, DateTime startDate)
+        {
+            var task = _repo.GetById(id);
+            if (task == null) return false;
+            task.StartDate = startDate;
+            return _repo.Update(id, task);
+        }
+
+        public bool UpdateEndDate(int id, DateTime endDate)
+        {
+            var task = _repo.GetById(id);
+            if (task == null) return false;
+            task.EndDate = endDate;
+            return _repo.Update(id, task);
+        }
+
+        public bool UpdateStatus(int id, TaskEntity.Status status)
+        {
+            var task = _repo.GetById(id);
+            if (task == null) return false;
+            task.Status = status;
+            return _repo.Update(id, task);
         }
     }
 }
