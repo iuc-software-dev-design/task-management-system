@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Data;
 using backend.src.ApplicationUser;
 using backend.src.User;
 
@@ -10,11 +11,13 @@ namespace backend.src.Task
     {
         private readonly TaskRepo _repo;
         private readonly UserRepo _userRepo;
+        private readonly AppDbContext _context;
 
-        public TaskService(TaskRepo repo, UserRepo userRepo)
+        public TaskService(TaskRepo repo, UserRepo userRepo, AppDbContext context)
         {
             _repo = repo;
             _userRepo = userRepo;
+            _context = context;
         }
 
         public async Task<List<TaskDto>> ListTasks()
@@ -60,19 +63,30 @@ namespace backend.src.Task
             return ToDto(created);
         }
 
-        // Mevcut Update metodunu kullan - değişiklik yok
         public async Task<bool> UpdateTask(int id, UpdateTaskDto updateDto)
         {
-            var updatedTask = new TaskEntity
-            {
-                Title = updateDto.Title,
-                Description = updateDto.Description,
-                StartDate = updateDto.StartDate,
-                EndDate = updateDto.EndDate,
-                TaskStatus = updateDto.TaskStatus
-            };
+            var task = await _repo.GetById(id);
+            if (task == null) return false;
 
-            return await _repo.Update(id, updatedTask); // Mevcut metodu kullan
+            // Null olmayan alanları güncelle
+            if (!string.IsNullOrWhiteSpace(updateDto.Title))
+                task.Title = updateDto.Title;
+                
+            if (!string.IsNullOrWhiteSpace(updateDto.Description))
+                task.Description = updateDto.Description;
+                
+            if (updateDto.StartDate.HasValue)
+                task.StartDate = updateDto.StartDate.Value;
+                
+            if (updateDto.EndDate.HasValue)
+                task.EndDate = updateDto.EndDate.Value;
+                
+            if (updateDto.TaskStatus.HasValue)
+                task.TaskStatus = updateDto.TaskStatus.Value;
+
+            // Direkt context üzerinden save et
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> DeleteTask(int id)

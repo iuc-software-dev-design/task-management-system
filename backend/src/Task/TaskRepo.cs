@@ -41,12 +41,8 @@ namespace backend.src.Task
             var task = await GetById(id);
             if (task == null) return false;
 
-            task.Title = updatedTask.Title;
-            task.Description = updatedTask.Description;
-            task.StartDate = updatedTask.StartDate;
-            task.EndDate = updatedTask.EndDate;
-            task.TaskStatus = updatedTask.TaskStatus;
-
+            // Direkt entity'yi güncelle (Service layer'da zaten kontrol edildi)
+            _context.Entry(task).CurrentValues.SetValues(updatedTask);
             await _context.SaveChangesAsync();
             return true;
         }

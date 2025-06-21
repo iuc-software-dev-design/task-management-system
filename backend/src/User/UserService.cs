@@ -32,10 +32,16 @@ namespace backend.src.User
             var user = await _repo.GetById(id);
             if (user == null) return null;
 
-            user.Name = updateDto.Name ?? user.Name;
-            user.Email = updateDto.Email ?? user.Email;
+            // Sadece gönderilen (null olmayan) alanları güncelle
+            if (!string.IsNullOrWhiteSpace(updateDto.Name))
+                user.Name = updateDto.Name;
+                
+            if (!string.IsNullOrWhiteSpace(updateDto.Email))
+                user.Email = updateDto.Email;
 
-            await _repo.UpdateAsync(user);
+            var result = await _repo.UpdateAsync(user);
+            if (!result) return null;
+            
             return ToDto(user);
         }
 
