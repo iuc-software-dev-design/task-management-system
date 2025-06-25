@@ -24,6 +24,17 @@ namespace backend.src.Task
             return Ok(tasks);
         }
 
+        [HttpGet("my")]
+        public async Task<ActionResult<List<TaskDto>>> GetMyTasks()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var tasks = await _service.GetMyTasks(userId);
+            return Ok(tasks);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskDto>> GetTask(int id)
         {
@@ -33,6 +44,7 @@ namespace backend.src.Task
         }
 
         [HttpPost]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")]
         public async Task<ActionResult<TaskDto>> CreateTask([FromBody] CreateTaskDto createDto)
         {
             if (!ModelState.IsValid)
@@ -62,6 +74,7 @@ namespace backend.src.Task
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")]
         public async Task<IActionResult> DeleteTask(int id)
         {
             var result = await _service.DeleteTask(id);
@@ -70,6 +83,7 @@ namespace backend.src.Task
         }
 
         [HttpPost("{id}/assign")]
+        [Authorize(Roles = "MANAGER,TEAM_LEAD")]
         public async Task<IActionResult> AssignTask(int id, [FromBody] AssignTaskDto assignDto)
         {
             if (!ModelState.IsValid)
