@@ -40,3 +40,6 @@ appsettings.*.json
 
 # Windows Thumbnail cache
 Thumbs.db
+
+# Frontend
+node_modules/
