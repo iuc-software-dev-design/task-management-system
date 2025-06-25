@@ -291,7 +291,7 @@ function HomePage() {
 
       if (response.ok) {
         // Users listesindeki kullanıcının role'ünü güncelle
-        const roleNames = ["USER", "TEAM_LEAD", "MANAGER"];
+        const roleNames = ["USER", "MANAGER", "TEAM_LEAD"];
         setUsers(
           users.map((user) =>
             user.id === userId
@@ -748,7 +748,7 @@ function HomePage() {
                           value={
                             user.userRole === "USER"
                               ? 0
-                              : user.userRole === "TEAM_LEAD"
+                              : user.userRole === "MANAGER"
                               ? 1
                               : 2
                           }
@@ -758,8 +758,8 @@ function HomePage() {
                           className="role-select"
                         >
                           <option value={0}>User</option>
-                          <option value={1}>Team Lead</option>
-                          <option value={2}>Manager</option>
+                          <option value={1}>Manager</option>
+                          <option value={2}>Team Lead</option>
                         </select>
                       )}
 
