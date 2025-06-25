@@ -132,6 +132,25 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowReactApp");
 
+// Apply migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        logger.LogInformation("Applying migrations...");
+        context.Database.Migrate();
+        logger.LogInformation("Migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error applying migrations");
+    }
+}
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

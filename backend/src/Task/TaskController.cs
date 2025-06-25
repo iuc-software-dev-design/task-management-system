@@ -74,7 +74,7 @@ namespace backend.src.Task
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "MANAGER,TEAM_LEAD")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> DeleteTask(int id)
         {
             var result = await _service.DeleteTask(id);
